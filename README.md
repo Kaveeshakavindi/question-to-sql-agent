@@ -18,25 +18,7 @@ The objective is to build a small but complete AI agent system that demonstrates
 
 The main behaviour is:
 
-```text
-Natural Language Question
-        ↓
-Generate SQL
-        ↓
-Execute SQL through MCP
-        ↓
-    Success?
-     ┌──┴──┐
-    YES    NO
-     ↓      ↓
-  Return   SQL Error
-              ↓
-        Correct SQL with LLM
-              ↓
-        Execute Again
-              ↓
-           Success
-```
+![System Flow](assets/flow.png)
 
 ## What it does
 

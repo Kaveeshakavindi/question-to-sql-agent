@@ -6,6 +6,7 @@ from app.telemetry import tracer
 from app.prompts import (
     SQL_GENERATION_PROMPT,
     SQL_CORRECTION_PROMPT,
+    SQL_REVISION_PROMPT
 )
 
 load_dotenv()
@@ -74,3 +75,34 @@ def correct_sql(
         )
 
         return corrected_sql
+    
+def revise_sql(
+    question: str,
+    sql: str,
+    feedback: str,
+) -> str:
+    """Revise a SQL query based on the reviewer's feedback."""
+
+    with tracer.start_as_current_span("llm.revise_sql") as span:
+
+        span.set_attribute("gen_ai.request.model", "gemini-2.5-flash")
+        span.set_attribute("user.question", question)
+        span.set_attribute("original.sql", sql)
+        span.set_attribute("reviewer.feedback", feedback)
+
+        schema = get_schema()
+
+        prompt = SQL_REVISION_PROMPT.format(
+            schema=schema,
+            question=question,
+            sql=sql,
+            feedback=feedback,
+        )
+
+        response = llm.invoke(prompt)
+
+        revised_sql = response.content.strip()
+
+        span.set_attribute("revised.sql", revised_sql)
+
+        return revised_sql

@@ -1,9 +1,12 @@
+import asyncio
+
 from app.graph import run_sql_agent
 from arq.connections import RedisSettings
 
 
 async def run_agent_job(ctx, question: str, initial_sql: str | None = None):
-    result = run_sql_agent(
+    result = await asyncio.to_thread(
+        run_sql_agent,
         question=question,
         initial_sql=initial_sql,
     )
@@ -19,7 +22,4 @@ async def run_agent_job(ctx, question: str, initial_sql: str | None = None):
 
 class WorkerSettings:
     functions = [run_agent_job]
-    redis_settings = RedisSettings(
-        host="localhost",
-        port=6379,
-    )
+    redis_settings = RedisSettings(host="localhost", port=6379)

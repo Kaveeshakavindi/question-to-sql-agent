@@ -139,23 +139,6 @@ This separates the agent's reasoning from the database implementation and provid
 
 The project uses OpenTelemetry and Jaeger to trace the agent execution.
 
-A typical successful self-healing trace is:
-
-```text
-agent.run
-├── MCP → get_database_schema
-├── sql.execute ❌
-│     ├── SQL
-│     ├── database error
-│     └── stacktrace
-├── llm.correct_sql
-│     ├── failed SQL
-│     ├── database error
-│     └── corrected SQL
-└── sql.execute ✅
-      └── corrected SQL
-```
-
 The trace records information including:
 
 - user question
@@ -174,6 +157,8 @@ Jaeger can be accessed locally at:
 ```text
 http://localhost:16686
 ```
+
+![telemtry traces via Jaeger](assets/telemetrytraces.png)
 
 OpenTelemetry is used for **observability of the agent execution**, rather than as an explainability method.
 
@@ -450,26 +435,6 @@ Select the service:
 self-healing-sql-agent
 ```
 
-A self-healing execution should show:
-
-```text
-agent.run
-    ↓
-sql.execute ❌
-    ↓
-llm.correct_sql
-    ↓
-sql.execute ✅
-```
-
-MCP operations such as:
-
-```text
-MCP send tools/call execute_sql
-MCP send tools/call get_database_schema
-```
-
-are also visible in the trace.
 
 ## API
 
@@ -558,30 +523,12 @@ Implemented:
 - exception and stacktrace recording
 - MCP operation tracing
 
-## Current Limitations
+### Phase 04 — 
 
-- The database is currently SQLite and intended for local demonstration.
-- SQL execution is not yet restricted to read-only operations.
-- The MCP client currently creates a new MCP session for individual operations.
-- The agent relies on the LLM to generate syntactically and semantically appropriate SQL.
-- There is no persistent conversation or query history.
-- The evaluation currently focuses on functional recovery rather than a large benchmark.
-- The current API exposes a small job-based interface rather than a production authentication layer.
+Implemented:
 
-## Next Steps
-
-Potential improvements include:
-
-- long-lived MCP client sessions
-- database permission and SQL safety policies
-- PostgreSQL and `pgvector` integration
-- schema retrieval through a vector/RAG layer
-- larger SQL error evaluation dataset
-- structured agent outputs
-- query execution timeouts
-- query result limits
-- authentication and API security
-- persistent execution history
-- agent performance metrics
-- richer evaluation of self-healing accuracy
-- deployment using separate API and worker services
+- independent reviewer agent
+- structured review verdicts (`approved`, `issues`, `suggested_fix`) via Pydantic
+- blocks INSERT/UPDATE/DELETE/DROP/ALTER before any LLM call
+- reviewer feedback fed back to the writer through shared graph state
+- review applied to user-supplied SQL, writer output and DB-error corrections

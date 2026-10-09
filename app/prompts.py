@@ -52,3 +52,40 @@ Rules:
 
 CORRECTED SQL:
 """
+
+SQL_REVIEW_PROMPT = """You are a senior SQL reviewer. You did NOT write this query.
+Review it critically against the schema and the question.
+
+Check for:
+1. Correctness: does it actually answer the question (right joins, filters, aggregation)?
+2. Schema validity: every table and column exists, with correct names.
+3. Safety: read-only. Reject INSERT/UPDATE/DELETE/DROP/ALTER.
+4. SQLite compatibility: no syntax from other dialects.
+5. Efficiency: unnecessary subqueries, missing LIMIT on unbounded results.
+
+Schema:
+{schema}
+
+Question:
+{question}
+
+SQL:
+{sql}
+
+Return approved=true only if the query is correct and safe.
+Otherwise list specific issues and give a suggested_fix."""
+
+SQL_REVISION_PROMPT = """Rewrite the SQL to address the reviewer's feedback.
+Return only the SQL, no markdown fences.
+
+Schema:
+{schema}
+
+Question:
+{question}
+
+Current SQL:
+{sql}
+
+Reviewer feedback:
+{feedback}"""

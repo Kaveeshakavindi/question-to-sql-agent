@@ -84,23 +84,9 @@ The agent does not directly access the SQLite implementation during its tool exe
 
 ## Self-Healing Agent
 
-The LangGraph workflow contains three main stages:
+The LangGraph StateGraph contains three main stages:
 
 ![LangGraph StateGraph](assets/diagram.png)
-
-```text
-generate_sql
-     ↓
-execute_sql
-     ↓
-  error?
- ┌───┴────┐
- NO       YES
- ↓         ↓
-END   correct_sql
-           ↓
-      execute_sql
-```
 
 The agent state tracks:
 

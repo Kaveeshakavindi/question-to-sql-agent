@@ -104,6 +104,8 @@ The agent does not directly access the SQLite implementation during its tool exe
 
 The LangGraph workflow contains three main stages:
 
+![LangGraph StateGraph](assets/diagram.png)
+
 ```text
 generate_sql
      ↓
